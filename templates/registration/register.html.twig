@@ -5,27 +5,72 @@
 {% block body %}
     {# Affichage des erreurs de validation de l'email s'il y en a #}
     {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+        <div class="alert alert-danger" role="alert" style="max-width: 400px; margin: 20px auto; padding: 10px; border-radius: 4px;">{{ flash_error }}</div>
     {% endfor %}
 
-    <h1>Créer un compte</h1>
+    <div style="max-width: 400px; margin: 40px auto; background-color: #ffffff; border: 1px solid #ccc; padding: 30px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+        {{ form_start(registrationForm, {'attr': {'class': 'registration-form'}}) }}
+            {# Titre avec soulignement bleu clair #}
+            <h2 style="font-size: 20px; font-weight: 700; margin: 0 0 10px 0; color: #333; text-align: left; font-family: 'Inter', sans-serif;">S'inscrire</h2>
+            <div style="height: 2px; background-color: #e3f2fd; margin-bottom: 20px; width: 100%;"></div>
 
-    {{ form_errors(registrationForm) }}
+            {{ form_errors(registrationForm) }}
 
-    {{ form_start(registrationForm, {'attr': {'class': 'registration-form'}}) }}
-        {{ form_row(registrationForm.name) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.deliveryAddress) }}
-        {{ form_row(registrationForm.plainPassword) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+            {# Nom utilisateur #}
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label for="{{ registrationForm.name.vars.id }}" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 5px; color: #555; font-family: 'Inter', sans-serif;">Nom utilisateur :</label>
+                {{ form_widget(registrationForm.name, {'attr': {'placeholder': 'johndoe', 'style': 'width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;'}}) }}
+            </div>
 
-        <button type="submit" class="btn">S'inscrire</button>
+            {# Adresse mail #}
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label for="{{ registrationForm.email.vars.id }}" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 5px; color: #555; font-family: 'Inter', sans-serif;">Adresse mail :</label>
+                {{ form_widget(registrationForm.email, {'attr': {'placeholder': 'johndoe@gmail.com', 'style': 'width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;'}}) }}
+            </div>
 
-        <div class="mt-4" style="border-top: 1px solid #eee; padding-top: 20px;">
-            <p style="margin-bottom: 10px; font-weight: 600;">Déjà inscrit ?</p>
-            <a href="{{ path('app_login') }}" class="btn" style="background-color: #007bff; color: #fff; display: inline-block;">
-                Se connecter
-            </a>
-        </div>
-    {{ form_end(registrationForm) }}
+            {# Adresse de livraison #}
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label for="{{ registrationForm.deliveryAddress.vars.id }}" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 5px; color: #555; font-family: 'Inter', sans-serif;">Adresse de livraison</label>
+                {{ form_widget(registrationForm.deliveryAddress, {'attr': {'placeholder': '8 rue du bac 54100 Nancy', 'style': 'width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;'}}) }}
+            </div>
+
+            {# Mot de passe #}
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label for="{{ registrationForm.plainPassword.first.vars.id }}" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 5px; color: #555; font-family: 'Inter', sans-serif;">Mot de passe</label>
+                {{ form_widget(registrationForm.plainPassword.first, {'attr': {'placeholder': '********', 'style': 'width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;'}}) }}
+            </div>
+
+            {# Confirmer le mot de passe #}
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label for="{{ registrationForm.plainPassword.second.vars.id }}" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 5px; color: #555; font-family: 'Inter', sans-serif;">Confirmer le mot de passe :</label>
+                {{ form_widget(registrationForm.plainPassword.second, {'attr': {'placeholder': '********', 'style': 'width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;'}}) }}
+            </div>
+
+            {# Case CGU #}
+            <div style="margin-bottom: 20px; text-align: left;">
+                <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; font-family: 'Inter', sans-serif;">
+                    {{ form_widget(registrationForm.agreeTerms) }}
+                    J'accepte les conditions d'utilisation
+                </label>
+            </div>
+
+            {# Bouton Créer un compte #}
+            <div style="text-align: left; margin-bottom: 20px;">
+                <button type="submit" class="btn" style="background-color: #54b4ff; color: #fff; border: none; padding: 12px 30px; font-size: 16px; font-weight: 700; border-radius: 6px; cursor: pointer; text-shadow: 0 1px 1px rgba(0,0,0,0.1); width: auto;">
+                    Créer un compte
+                </button>
+            </div>
+
+            {# Séparateur bleu #}
+            <div style="height: 2px; background-color: #e3f2fd; margin-bottom: 20px; width: 100%;"></div>
+
+            {# Redirection connexion #}
+            <div style="text-align: left;">
+                <p style="margin: 0 0 10px 0; font-weight: 600; font-size: 14px; color: #555; font-family: 'Inter', sans-serif;">Déjà inscrit ?</p>
+                <a href="{{ path('app_login') }}" class="btn" style="background-color: #54b4ff; color: #fff; padding: 12px 30px; font-size: 16px; font-weight: 700; border-radius: 6px; display: inline-block; text-decoration: none; text-shadow: 0 1px 1px rgba(0,0,0,0.1); text-align: center; width: auto; box-sizing: border-box;">
+                    Se Connecter
+                </a>
+            </div>
+        {{ form_end(registrationForm) }}
+    </div>
 {% endblock %}
