@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boutique - Stubborn{% endblock %}
+
+{% block body %}
+    <div style="margin-bottom: 40px; text-align: center;">
+        <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 20px;">Tous nos Sweat-shirts</h1>
+        
+        {# Liens de retour à l'accueil #}
+        <a href="{{ path('app_home') }}" style="color: #666; text-decoration: none; font-size: 14px;">&larr; Retourner à l'accueil</a>
+    </div>
+
+    {# Système de filtrage par prix #}
+    <div class="filters-container" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 40px;">
+        <span style="align-self: center; font-weight: 600;">Filtrer par prix :</span>
+        
+        <a href="{{ path('app_products') }}" class="btn {% if current_filter is empty %}filter-active{% endif %}" style="background-color: {% if current_filter is empty %}#000{% else %}#ccc{% endif %}; color: #fff;">
+            Tous les produits
+        </a>
+        
+        <a href="{{ path('app_products', { 'price_filter': '10-29' }) }}" class="btn {% if current_filter == '10-29' %}filter-active{% endif %}" style="background-color: {% if current_filter == '10-29' %}#000{% else %}#ccc{% endif %}; color: #fff;">
+            10 € à 29 €
+        </a>
+        
+        <a href="{{ path('app_products', { 'price_filter': '29-35' }) }}" class="btn {% if current_filter == '29-35' %}filter-active{% endif %}" style="background-color: {% if current_filter == '29-35' %}#000{% else %}#ccc{% endif %}; color: #fff;">
+            29 € à 35 €
+        </a>
+        
+        <a href="{{ path('app_products', { 'price_filter': '35-50' }) }}" class="btn {% if current_filter == '35-50' %}filter-active{% endif %}" style="background-color: {% if current_filter == '35-50' %}#000{% else %}#ccc{% endif %}; color: #fff;">
+            35 € à 50 €
+        </a>
+    </div>
+
+    {# Grille des produits #}
+    <div class="products-grid">
+        {% for product in products %}
+            <div class="product-card">
+                <div>
+                    {# Image du sweat-shirt (avec repli vers un placeholder si l'image physique n'existe pas encore) #}
+                    <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}">
+                    <h3>{{ product.name }}</h3>
+                    <p class="price">{{ product.price|number_format(2, ',', ' ') }} €</p>
+                </div>
+                
+                <div>
+                    {# Bouton Voir menant vers la fiche individuelle du produit #}
+                    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn">Voir</a>
+                </div>
+            </div>
+        {% else %}
+            <p style="text-align: center; color: #777; grid-column: 1 / -1; font-size: 18px; margin-top: 40px;">
+                Aucun sweat-shirt ne correspond à cette tranche de prix.
+            </p>
+        {% endfor %}
+    </div>
+{% endblock %}

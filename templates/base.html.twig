@@ -2,9 +2,17 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <title>{% block title %}Stubborn - Don't compromise on your look{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>👕</text></svg>">
+        
+        {# On inclut la police Google Font Inter pour une typographie plus premium #}
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+        
         {% block stylesheets %}
+            {# Importation du fichier CSS global #}
+            <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
         {% endblock %}
 
         {% block javascripts %}
@@ -19,6 +27,59 @@
         {% endif %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        {# Détermination de la route courante pour styliser le lien actif #}
+        {% set current_route = app.request.attributes.get('_route') %}
+
+        <header class="main-header">
+            <nav class="navbar">
+                <div class="logo">
+                    <a href="{{ path('app_home') }}">Stubborn</a>
+                </div>
+                <ul class="nav-links">
+                    {# Lien Accueil présent pour tout le monde #}
+                    <li>
+                        <a href="{{ path('app_home') }}" class="{% if current_route == 'app_home' %}active-link{% endif %}">Accueil</a>
+                    </li>
+
+                    {% if app.user %}
+                        {# Liens affichés uniquement pour les utilisateurs CONNECTÉS #}
+                        <li>
+                            <a href="{{ path('app_products') }}" class="{% if current_route == 'app_products' %}active-link{% endif %}">Boutique</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('app_cart') }}" class="{% if current_route == 'app_cart' %}active-link{% endif %}">Panier</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('app_logout') }}">Se déconnecter</a>
+                        </li>
+                    {% else %}
+                        {# Liens affichés uniquement pour les utilisateurs NON CONNECTÉS #}
+                        <li>
+                            <a href="{{ path('app_login') }}" class="{% if current_route == 'app_login' %}active-link{% endif %}">Se connecter</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('app_register') }}" class="{% if current_route == 'app_register' %}active-link{% endif %}">S'inscrire</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </header>
+
+        <main class="container">
+            {# Affichage des messages flash de succès ou d'erreur #}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label == 'error' ? 'danger' : label }}" style="padding: 15px; margin-bottom: 20px; border-radius: 4px; background-color: {% if label == 'success' %}#d4edda{% else %}#f8d7da{% endif %}; color: {% if label == 'success' %}#155724{% else %}#721c24{% endif %}; border: 1px solid {% if label == 'success' %}#c3e6cb{% else %}#f5c6cb{% endif %};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {% block body %}{% endblock %}
+        </main>
+
+        <footer class="main-footer">
+            <p>&copy; {{ "now"|date("Y") }} Stubborn. Piccadilly Circus, London W1J 0DA, Royaume-Uni.</p>
+        </footer>
     </body>
 </html>

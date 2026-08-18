@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.name }} - Stubborn{% endblock %}
+
+{% block body %}
+    <div style="margin-bottom: 20px;">
+        <a href="{{ path('app_products') }}" style="color: #666; text-decoration: none; font-size: 14px;">&larr; Retourner à la boutique</a>
+    </div>
+
+    <div class="product-details" style="display: flex; gap: 50px; background-color: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-top: 20px;">
+        {# Partie gauche : Image du produit #}
+        <div class="product-image" style="flex: 1; text-align: center;">
+            <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/500x550?text={{ product.name }}';" alt="{{ product.name }}" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        </div>
+
+        {# Partie droite : Informations et Formulaire de sélection de taille #}
+        <div class="product-info" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+            <h1 style="font-size: 36px; font-weight: 700; margin: 0 0 10px 0;">{{ product.name }}</h1>
+            <p class="price" style="font-size: 28px; font-weight: 600; color: #111; margin: 0 0 30px 0;">{{ product.price|number_format(2, ',', ' ') }} €</p>
+
+            {# Formulaire d'ajout au panier #}
+            <form action="{{ path('app_cart_add', {'id': product.id}) }}" method="post" data-turbo="false" style="margin-top: 20px;">
+                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">Sélectionnez une taille :</h3>
+                
+                <div class="sizes-container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;">
+                    {# Liste des tailles standards requises par le brief #}
+                    {% for size in ['XS', 'S', 'M', 'L', 'XL'] %}
+                        {# Recherche de l'entité stock correspondante pour cette taille #}
+                        {% set stock_item = null %}
+                        {% for s in product.stocks %}
+                            {% if s.size == size %}
+                                {% set stock_item = s %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {# Vérification de la disponibilité du stock pour cette taille #}
+                        {% set is_available = stock_item is not null and stock_item.quantity > 0 %}
+                        {% set quantity = stock_item is not null ? stock_item.quantity : 0 %}
+
+                        <label class="size-option" style="display: flex; align-items: center; gap: 10px; padding: 10px 15px; border: 1px solid {% if is_available %}#ddd{% else %}#eee{% endif %}; border-radius: 6px; cursor: {% if is_available %}pointer{% else %}not-allowed{% endif %}; background-color: {% if not is_available %}#fafafa{% else %}#fff{% endif %}; color: {% if not is_available %}#aaa{% else %}#333{% endif %};">
+                            <input type="radio" name="size" value="{{ size }}" {% if not is_available %}disabled{% endif %} required style="cursor: {% if is_available %}pointer{% else %}not-allowed{% endif %};">
+                            <span style="font-weight: 600; width: 30px;">{{ size }}</span>
+                            
+                            <span style="font-size: 14px; margin-left: auto;">
+                                {% if is_available %}
+                                    <span style="color: #28a745;">En stock ({{ quantity }} disponibles)</span>
+                                {% else %}
+                                    <span style="color: #dc3545; font-style: italic;">Rupture de stock</span>
+                                {% endif %}
+                            </span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                {# Bouton d'ajout au panier #}
+                <button type="submit" class="btn" style="width: 100%; padding: 15px; font-size: 18px; border-radius: 6px;">
+                    Ajouter au panier
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

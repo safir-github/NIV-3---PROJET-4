@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - Stubborn{% endblock %}
+
+{% block body %}
+    {# 1. Section Présentation de la Société Stubborn (données du brief) #}
+    <section class="presentation-section">
+        <h1>Stubborn</h1>
+        <p class="slogan">"Don't compromise on your look"</p>
+        <p class="description">
+            Bienvenue chez Stubborn, votre boutique en ligne de sweat-shirts premium. Nous concevons nos modèles 
+            avec exigence pour vous proposer des coupes parfaites et un style sans compromis.
+        </p>
+        <div class="contact-info" style="margin-top: 15px; font-size: 14px; color: #555;">
+            <strong>Adresse :</strong> Piccadilly Circus, London W1J 0DA, Royaume-Uni | 
+            <strong>Contact :</strong> stubborn@blabla.com
+        </div>
+    </section>
+
+    {# 2. Section Produits mis en avant #}
+    <section class="featured-section">
+        <h2 style="text-align: center; font-size: 28px; margin-bottom: 30px;">Nos produits mis en avant</h2>
+        
+        <div class="products-grid">
+            {% for product in featured_products %}
+                <div class="product-card">
+                    <div>
+                        {# Image du produit (les images fictives seront stockées dans public/images/) #}
+                        {# Pour l'instant, on met un placeholder d'image si l'image n'est pas encore présente #}
+                        <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}">
+                        <h3>{{ product.name }}</h3>
+                        <p class="price">{{ product.price|number_format(2, ',', ' ') }} €</p>
+                    </div>
+                    
+                    {# 
+                        Consigne : "Si l’utilisateur n’est pas connecté les boutons « Voir » des produits mis en avant n’apparaissent pas"
+                        Nous vérifions donc si l'utilisateur est connecté (app.user) avant d'afficher le bouton.
+                    #}
+                    {% if app.user %}
+                        <div>
+                            {# Lien vers la fiche produit. Pour l'instant, la route prend l'identifiant du produit #}
+                            {# Comme nous n'avons pas encore créé cette route finale, on pointe vers un hashtag pour ne pas planter #}
+                            <a href="#" class="btn">Voir</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <p style="text-align: center; color: #777; grid-column: 1 / -1;">Aucun produit mis en avant pour le moment.</p>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}
