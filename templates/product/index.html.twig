@@ -37,17 +37,19 @@
         <div style="flex-grow: 1;">
             <div class="products-grid" style="margin-top: 0;">
                 {% for product in products %}
-                    <div class="product-card">
-                        <div>
-                            {# Image du sweat-shirt (avec repli vers un placeholder si l'image physique n'existe pas encore) #}
-                            <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}">
-                            <h3>{{ product.name }}</h3>
-                            <p class="price">{{ product.price|number_format(2, ',', ' ') }} €</p>
-                        </div>
+                    <div class="product-card" style="text-align: left;">
+                        {# Image du sweat-shirt #}
+                        <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}" style="width: 100%; display: block; margin-bottom: 15px;">
                         
-                        <div>
-                            {# Bouton Voir menant vers la fiche individuelle du produit #}
-                            <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn">Voir</a>
+                        {# Zone basse : Informations à gauche, Bouton à droite #}
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; margin-top: auto;">
+                            <div>
+                                <h3 style="font-size: 18px; font-weight: 700; margin: 0; color: #111;">{{ product.name }}</h3>
+                                <p class="price" style="font-size: 16px; font-weight: 600; color: #666; margin: 5px 0 0 0;">{{ product.price|number_format(2, ',', ' ') }} €</p>
+                            </div>
+                            <div>
+                                <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn" style="padding: 8px 18px; font-size: 13px; text-transform: uppercase;">Voir</a>
+                            </div>
                         </div>
                     </div>
                 {% else %}
