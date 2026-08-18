@@ -20,11 +20,8 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
-        // Récupération des 3 sweat-shirts mis en avant (isFeatured = true)
         $featuredProducts = $this->productRepository->findBy(
-            ['isFeatured' => true],
-            null,
-            3
+            ['isFeatured' => true]
         );
 
         return $this->render('home/index.html.twig', [

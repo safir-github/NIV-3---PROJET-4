@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration des Produits - Stubborn{% endblock %}
+
+{% block body %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <h1 style="font-size: 32px; font-weight: 700; margin: 0;">Gestion du Catalogue (Back-office)</h1>
+        
+        {# Bouton pour ajouter un produit #}
+        <a href="{{ path('app_admin_new') }}" class="btn" style="background-color: #28a745;">
+            + Ajouter un sweat-shirt
+        </a>
+    </div>
+
+    {# Tableau récapitulatif des produits #}
+    <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 800px;">
+            <thead>
+                <tr style="border-bottom: 2px solid #eee; padding-bottom: 15px; font-weight: 600; color: #555;">
+                    <th style="padding: 15px 10px;">ID</th>
+                    <th style="padding: 15px 10px;">Visuel</th>
+                    <th style="padding: 15px 10px;">Nom</th>
+                    <th style="padding: 15px 10px;">Prix</th>
+                    <th style="padding: 15px 10px; text-align: center;">Vedette (Home)</th>
+                    <th style="padding: 15px 10px;">Stocks par taille</th>
+                    <th style="padding: 15px 10px; text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    <tr style="border-bottom: 1px solid #f2f2f2; font-size: 15px;">
+                        <td style="padding: 15px 10px; color: #666;">#{{ product.id }}</td>
+                        
+                        {# Image miniature #}
+                        <td style="padding: 15px 10px;">
+                            <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/50x60?text=Sweat';" alt="{{ product.name }}" style="width: 50px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #eee;">
+                        </td>
+                        
+                        {# Nom #}
+                        <td style="padding: 15px 10px; font-weight: 600; color: #111;">{{ product.name }}</td>
+                        
+                        {# Prix #}
+                        <td style="padding: 15px 10px;">{{ product.price|number_format(2, ',', ' ') }} €</td>
+                        
+                        {# Mis en avant (Featured) #}
+                        <td style="padding: 15px 10px; text-align: center;">
+                            {% if product.isFeatured %}
+                                <span style="background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Oui</span>
+                            {% else %}
+                                <span style="background-color: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Non</span>
+                            {% endif %}
+                        </td>
+                        
+                        {# Stocks par taille #}
+                        <td style="padding: 15px 10px; font-family: monospace; font-size: 13px; color: #444;">
+                            {% for stock in product.stocks %}
+                                <span style="display: inline-block; background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 2px 6px; margin: 2px;">
+                                    <strong>{{ stock.size }}</strong>: 
+                                    <span style="color: {% if stock.quantity > 0 %}#28a745{% else %}#dc3545{% endif %}; font-weight: bold;">
+                                        {{ stock.quantity }}
+                                    </span>
+                                </span>
+                            {% endfor %}
+                        </td>
+                        
+                        {# Boutons Modifier / Supprimer #}
+                        <td style="padding: 15px 10px; text-align: right; white-space: nowrap;">
+                            <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                                <a href="{{ path('app_admin_edit', {'id': product.id}) }}" class="btn" style="background-color: #ffc107; color: #212529; padding: 6px 12px; font-size: 14px;">
+                                    Modifier
+                                </a>
+
+                                {# Formulaire de suppression sécurisé par jeton CSRF #}
+                                <form method="post" action="{{ path('app_admin_delete', {'id': product.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer définitivement le sweat-shirt &quot;{{ product.name }}&quot; ? \n\nLes stocks associés seront également supprimés en cascade.');" style="display: inline-block; margin: 0;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                                    <button class="btn" style="background-color: #dc3545; color: #fff; padding: 6px 12px; font-size: 14px; border: none; cursor: pointer; border-radius: 4px;">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #777; padding: 40px; font-size: 16px;">
+                            Aucun sweat-shirt n'est présent dans le catalogue de la base de données.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
