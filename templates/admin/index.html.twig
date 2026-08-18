@@ -1,93 +1,139 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Administration des Produits - Stubborn{% endblock %}
+{% block title %}Back-Office - Stubborn{% endblock %}
 
 {% block body %}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-        <h1 style="font-size: 32px; font-weight: 700; margin: 0;">Gestion du Catalogue (Back-office)</h1>
-        
-        {# Bouton pour ajouter un produit #}
-        <a href="{{ path('app_admin_new') }}" class="btn" style="background-color: #28a745;">
-            + Ajouter un sweat-shirt
-        </a>
+    <div style="margin-bottom: 30px; text-align: center;">
+        <h1 style="font-size: 32px; font-weight: 700; margin: 0 0 10px 0;">Back-Office</h1>
+        <p style="color: #666; font-size: 14px;">Gestion complète du catalogue de sweat-shirts et des stocks par taille.</p>
     </div>
 
-    {# Tableau récapitulatif des produits #}
-    <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 800px;">
-            <thead>
-                <tr style="border-bottom: 2px solid #eee; padding-bottom: 15px; font-weight: 600; color: #555;">
-                    <th style="padding: 15px 10px;">ID</th>
-                    <th style="padding: 15px 10px;">Visuel</th>
-                    <th style="padding: 15px 10px;">Nom</th>
-                    <th style="padding: 15px 10px;">Prix</th>
-                    <th style="padding: 15px 10px; text-align: center;">Vedette (Home)</th>
-                    <th style="padding: 15px 10px;">Stocks par taille</th>
-                    <th style="padding: 15px 10px; text-align: right;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                    <tr style="border-bottom: 1px solid #f2f2f2; font-size: 15px;">
-                        <td style="padding: 15px 10px; color: #666;">#{{ product.id }}</td>
-                        
-                        {# Image miniature #}
-                        <td style="padding: 15px 10px;">
-                            <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/50x60?text=Sweat';" alt="{{ product.name }}" style="width: 50px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #eee;">
-                        </td>
-                        
-                        {# Nom #}
-                        <td style="padding: 15px 10px; font-weight: 600; color: #111;">{{ product.name }}</td>
-                        
-                        {# Prix #}
-                        <td style="padding: 15px 10px;">{{ product.price|number_format(2, ',', ' ') }} €</td>
-                        
-                        {# Mis en avant (Featured) #}
-                        <td style="padding: 15px 10px; text-align: center;">
-                            {% if product.isFeatured %}
-                                <span style="background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Oui</span>
-                            {% else %}
-                                <span style="background-color: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Non</span>
-                            {% endif %}
-                        </td>
-                        
-                        {# Stocks par taille #}
-                        <td style="padding: 15px 10px; font-family: monospace; font-size: 13px; color: #444;">
-                            {% for stock in product.stocks %}
-                                <span style="display: inline-block; background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 2px 6px; margin: 2px;">
-                                    <strong>{{ stock.size }}</strong>: 
-                                    <span style="color: {% if stock.quantity > 0 %}#28a745{% else %}#dc3545{% endif %}; font-weight: bold;">
-                                        {{ stock.quantity }}
-                                    </span>
-                                </span>
-                            {% endfor %}
-                        </td>
-                        
-                        {# Boutons Modifier / Supprimer #}
-                        <td style="padding: 15px 10px; text-align: right; white-space: nowrap;">
-                            <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
-                                <a href="{{ path('app_admin_edit', {'id': product.id}) }}" class="btn" style="background-color: #ffc107; color: #212529; padding: 6px 12px; font-size: 14px;">
-                                    Modifier
-                                </a>
+    {# ========================================== #}
+    {# 1. FORMULAIRE D'AJOUT D'UN PRODUIT (HAUT) #}
+    {# ========================================== #}
+    <div style="background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 25px; border-radius: 8px; margin-bottom: 45px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        <h2 style="font-size: 18px; font-weight: 700; margin: 0 0 20px 0; color: #721c24; border-bottom: 1px solid #f5c6cb; padding-bottom: 10px;">
+            Ajouter un nouveau produit
+        </h2>
+        
+        {{ form_start(addForm, {'action': path('app_admin_new'), 'attr': {'style': 'display: flex; flex-direction: column; gap: 15px;'}}) }}
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 2; min-width: 250px;">
+                    {{ form_row(addForm.name, {'attr': {'placeholder': 'Nom du sweat-shirt'}}) }}
+                </div>
+                <div style="flex: 1; min-width: 120px;">
+                    {{ form_row(addForm.price, {'attr': {'placeholder': 'Ex: 29.90'}}) }}
+                </div>
+                <div style="flex: 2; min-width: 250px;">
+                    {{ form_row(addForm.imageFile) }}
+                </div>
+                <div style="flex: 1; min-width: 100px; display: flex; align-items: center; justify-content: center; padding-top: 25px;">
+                    {{ form_row(addForm.isFeatured) }}
+                </div>
+            </div>
 
-                                {# Formulaire de suppression sécurisé par jeton CSRF #}
-                                <form method="post" action="{{ path('app_admin_delete', {'id': product.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer définitivement le sweat-shirt &quot;{{ product.name }}&quot; ? \n\nLes stocks associés seront également supprimés en cascade.');" style="display: inline-block; margin: 0;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
-                                    <button class="btn" style="background-color: #dc3545; color: #fff; padding: 6px 12px; font-size: 14px; border: none; cursor: pointer; border-radius: 4px;">
-                                        Supprimer
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: #777; padding: 40px; font-size: 16px;">
-                            Aucun sweat-shirt n'est présent dans le catalogue de la base de données.
-                        </td>
-                    </tr>
+            <h3 style="font-size: 14px; font-weight: 700; margin: 10px 0 5px 0; color: #721c24;">Stocks par taille :</h3>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; background-color: rgba(255,255,255,0.5); padding: 15px; border-radius: 6px; border: 1px solid #ebccd1;">
+                {% for size in ['XS', 'S', 'M', 'L', 'XL'] %}
+                    <div style="flex: 1; min-width: 80px;">
+                        <label style="font-weight: 700; font-size: 13px; display: block; margin-bottom: 5px; text-align: center; color: #721c24;">{{ size }}</label>
+                        {{ form_widget(attribute(addForm, 'stock_' ~ size), {'attr': {'min': 0, 'style': 'text-align: center;'}}) }}
+                    </div>
                 {% endfor %}
-            </tbody>
-        </table>
+            </div>
+
+            <div style="text-align: right; margin-top: 10px;">
+                <button type="submit" class="btn" style="background-color: #721c24; color: #fff; padding: 10px 30px; font-weight: 700; border-radius: 4px; border: none; cursor: pointer;">
+                    AJOUTER
+                </button>
+            </div>
+        {{ form_end(addForm) }}
+    </div>
+
+    {# ========================================== #}
+    {# 2. LISTE DES PRODUITS EXISTANTS (BAS)    #}
+    {# ========================================== #}
+    <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #111;">Sweat-shirts en catalogue</h2>
+
+    <div class="admin-products-list" style="display: flex; flex-direction: column; gap: 25px;">
+        {% for product in products %}
+            {# Chaque produit est enveloppé dans sa propre balise <form> pour modification en ligne #}
+            <div style="background-color: #ffffff; border: 1px solid #eee; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
+                <form action="{{ path('app_admin_edit', {'id': product.id}) }}" method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                        {# Mini visuel #}
+                        <div style="flex-shrink: 0; text-align: center;">
+                            <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/70x80?text=Sweat';" alt="{{ product.name }}" style="width: 70px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; display: block; margin-bottom: 5px;">
+                            <span style="font-size: 11px; color: #777; font-family: monospace;">#{{ product.id }}</span>
+                        </div>
+
+                        {# Formulaire Nom #}
+                        <div style="flex: 2; min-width: 200px;">
+                            <label style="font-weight: 600; font-size: 13px; color: #555; display: block; margin-bottom: 5px;">Nom</label>
+                            <input type="text" name="name" value="{{ product.name }}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+
+                        {# Formulaire Prix #}
+                        <div style="flex: 1; min-width: 100px;">
+                            <label style="font-weight: 600; font-size: 13px; color: #555; display: block; margin-bottom: 5px;">Prix (€)</label>
+                            <input type="number" name="price" value="{{ product.price }}" step="0.01" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+
+                        {# Formulaire Image #}
+                        <div style="flex: 2; min-width: 200px;">
+                            <label style="font-weight: 600; font-size: 13px; color: #555; display: block; margin-bottom: 5px;">Modifier l'image (optionnel)</label>
+                            <input type="file" name="imageFile" style="width: 100%; font-size: 12px;">
+                        </div>
+
+                        {# Formulaire Vedette #}
+                        <div style="flex-shrink: 0; text-align: center; padding-top: 15px;">
+                            <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 600; color: #333;">
+                                <input type="checkbox" name="isFeatured" {% if product.isFeatured %}checked{% endif %}>
+                                Vedette (Home)
+                            </label>
+                        </div>
+                    </div>
+
+                    {# Stocks par taille #}
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e9ecef;">
+                        {% for size in ['XS', 'S', 'M', 'L', 'XL'] %}
+                            {# Recherche de la quantité actuelle en base #}
+                            {% set qty = 0 %}
+                            {% for stock in product.stocks %}
+                                {% if stock.size == size %}
+                                    {% set qty = stock.quantity %}
+                                {% endif %}
+                            {% endfor %}
+                            <div style="flex: 1; min-width: 85px;">
+                                <label style="font-weight: 700; font-size: 12px; display: block; margin-bottom: 5px; text-align: center; color: #555;">Stock {{ size }}</label>
+                                <input type="number" name="stock_{{ size }}" value="{{ qty }}" min="0" required style="width: 100%; padding: 6px; text-align: center; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {# Boutons d'actions groupés en bas de chaque ligne #}
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee; padding-top: 15px; margin-top: 5px;">
+                        {# Jeton CSRF unique pour la modification de ce produit #}
+                        <input type="hidden" name="_token" value="{{ csrf_token('edit_product_' ~ product.id) }}">
+                        
+                        <button type="submit" class="btn" style="background-color: #007bff; color: #fff; padding: 8px 20px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; border-radius: 4px;">
+                            MODIFIER
+                        </button>
+                </form>
+
+                {# Formulaire de suppression sécurisé indépendant #}
+                <form method="post" action="{{ path('app_admin_delete', {'id': product.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer définitivement le sweat-shirt &quot;{{ product.name }}&quot; ? \n\nLes stocks associés seront également supprimés en cascade.');" style="display: inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                    <button type="submit" class="btn" style="background-color: #dc3545; color: #fff; padding: 8px 20px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; border-radius: 4px;">
+                        SUPPRIMER
+                    </button>
+                </form>
+                    </div>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 50px; background-color: #ffffff; border-radius: 8px; border: 1px solid #eee;">
+                <p style="color: #777; font-size: 16px;">Aucun sweat-shirt présent dans le catalogue.</p>
+            </div>
+        {% endfor %}
     </div>
 {% endblock %}
