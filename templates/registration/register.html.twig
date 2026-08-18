@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription - Stubborn{% endblock %}
+
+{% block body %}
+    {# Affichage des erreurs de validation de l'email s'il y en a #}
+    {% for flash_error in app.flashes('verify_email_error') %}
+        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+    {% endfor %}
+
+    <h1>Créer un compte</h1>
+
+    {{ form_errors(registrationForm) }}
+
+    {{ form_start(registrationForm, {'attr': {'class': 'registration-form'}}) }}
+        {{ form_row(registrationForm.name) }}
+        {{ form_row(registrationForm.email) }}
+        {{ form_row(registrationForm.deliveryAddress) }}
+        {{ form_row(registrationForm.plainPassword) }}
+        {{ form_row(registrationForm.agreeTerms) }}
+
+        <button type="submit" class="btn">S'inscrire</button>
+
+        <div class="mt-4">
+            <a href="{{ path('app_login') }}">Déjà inscrit ? Se connecter</a>
+        </div>
+    {{ form_end(registrationForm) }}
+{% endblock %}
