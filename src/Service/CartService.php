@@ -84,6 +84,24 @@ class CartService
     }
 
     /**
+     * Met à jour la quantité d'un article du panier.
+     */
+    public function updateQuantity(int $id, string $size, int $quantity): void
+    {
+        $cart = $this->getRawCart();
+        $key = $id . '-' . $size;
+
+        if (isset($cart[$key])) {
+            if ($quantity <= 0) {
+                unset($cart[$key]);
+            } else {
+                $cart[$key] = $quantity;
+            }
+            $this->saveCart($cart);
+        }
+    }
+
+    /**
      * Récupère le panier détaillé avec les informations complètes des produits 
      * récupérées de la base de données (image, nom, prix, etc.).
      * 

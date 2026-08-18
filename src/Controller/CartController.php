@@ -103,6 +103,30 @@ class CartController extends AbstractController
         return $this->redirectToRoute('app_cart');
     }
 
+    #[Route('/cart/update/{id}/{size}', name: 'app_cart_update', methods: ['POST'])]
+    public function update(int $id, string $size, Request $request): Response
+    {
+        $quantity = (int) $request->request->get('quantity', 1);
+
+        // Validation défensive du stock disponible pour cette taille
+        $product = $this->productRepository->find($id);
+        if ($product) {
+            foreach ($product->getStocks() as $stock) {
+                if ($stock->getSize() === $size) {
+                    if ($quantity > $stock->getQuantity()) {
+                        $this->addFlash('error', sprintf('Stock insuffisant pour la taille %s. Seulement %d exemplaire(s) disponible(s).', $size, $stock->getQuantity()));
+                        return $this->redirectToRoute('app_cart');
+                    }
+                    break;
+                }
+            }
+        }
+
+        $this->cartService->updateQuantity($id, $size, $quantity);
+
+        return $this->redirectToRoute('app_cart');
+    }
+
     #[Route('/cart/checkout', name: 'app_cart_checkout')]
     public function checkout(): Response
     {
