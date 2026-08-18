@@ -9,66 +9,54 @@
     </div>
 
     {% if cart_items|length > 0 %}
-        {# Table récapitulative des articles dans le panier #}
-        <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                <thead>
-                    <tr style="border-bottom: 2px solid #eee; padding-bottom: 15px; font-weight: 600; color: #555;">
-                        <th style="padding: 15px 0;">Produit</th>
-                        <th style="padding: 15px 0;">Taille</th>
-                        <th style="padding: 15px 0; text-align: center;">Quantité</th>
-                        <th style="padding: 15px 0; text-align: right;">Prix Unitaire</th>
-                        <th style="padding: 15px 0; text-align: right;">Sous-total</th>
-                        <th style="padding: 15px 0; text-align: right;">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in cart_items %}
-                        <tr style="border-bottom: 1px solid #f2f2f2; font-size: 16px;">
-                            {# Nom du produit et Image #}
-                            <td style="padding: 20px 0; display: flex; align-items: center; gap: 15px;">
-                                <img src="{{ asset('images/' ~ item.product.image) }}" onerror="this.src='https://placehold.co/80x90?text={{ item.product.name }}';" alt="{{ item.product.name }}" style="width: 60px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #eee;">
-                                <span style="font-weight: 600; color: #111;">{{ item.product.name }}</span>
-                            </td>
-                            
-                            {# Taille sélectionnée #}
-                            <td style="padding: 20px 0; font-weight: 600;">{{ item.size }}</td>
-                            
-                            {# Quantité #}
-                            <td style="padding: 20px 0; text-align: center;">{{ item.quantity }}</td>
-                            
-                            {# Prix Unitaire #}
-                            <td style="padding: 20px 0; text-align: right;">{{ item.product.price|number_format(2, ',', ' ') }} €</td>
-                            
-                            {# Sous-total #}
-                            <td style="padding: 20px 0; text-align: right; font-weight: 600;">{{ item.sub_total|number_format(2, ',', ' ') }} €</td>
-                            
-                            {# Bouton Supprimer #}
-                            <td style="padding: 20px 0; text-align: right;">
-                                {# data-turbo="false" pour forcer un rechargement classique sécurisé sans interférence de Turbo #}
-                                <a href="{{ path('app_cart_remove', {'id': item.product.id, 'size': item.size}) }}" data-turbo="false" style="color: #dc3545; text-decoration: none; font-size: 14px; font-weight: 600;">
-                                    Retirer
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        {# Liste des articles sous forme de blocs horizontaux indépendants selon le wireframe #}
+        <div class="cart-items-list" style="display: flex; flex-direction: column; gap: 20px;">
+            {% for item in cart_items %}
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 25px; background-color: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid #111; box-shadow: 0 4px 6px rgba(0,0,0,0.01); min-height: 120px;">
+                    {# Partie gauche : Image du produit #}
+                    <div style="flex-shrink: 0; width: 100px; height: 110px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; background-color: #fafafa;">
+                        <img src="{{ asset('images/' ~ item.product.image) }}" onerror="this.src='https://placehold.co/90x100?text={{ item.product.name }}';" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
 
-            {# Section Total et Validation #}
-            <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">
-                <div style="font-size: 22px; font-weight: 700; margin-bottom: 20px; color: #111;">
-                    Total : {{ total|number_format(2, ',', ' ') }} €
+                    {# Partie centrale : Informations alignées HORIZONTALEMENT (Nom, Prix, Taille, Quantité) #}
+                    <div style="flex-grow: 1; display: flex; justify-content: space-around; align-items: center; gap: 20px; font-size: 16px; font-family: 'Inter', sans-serif; font-weight: 600; color: #111;">
+                        <span>Nom : {{ item.product.name }}</span>
+                        <span>Prix : {{ item.product.price|number_format(2, ',', ' ') }} €</span>
+                        <span>Taille : {{ item.size }}</span>
+                        
+                        {# Formulaire en ligne de modification de la quantité #}
+                        <form action="{{ path('app_cart_update', {'id': item.product.id, 'size': item.size}) }}" method="post" data-turbo="false" style="display: inline-flex; align-items: center; gap: 8px; margin: 0;">
+                            <label style="font-size: 15px; font-weight: 600; color: #111;">Quantité :</label>
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" onchange="this.form.submit()" style="width: 55px; padding: 5px; border: 1px solid #111; border-radius: 4px; text-align: center; font-size: 15px; font-weight: bold; font-family: 'Inter', sans-serif;">
+                        </form>
+                    </div>
+
+                    {# Partie droite : Bouton Retirer du panier (avec bordure et fond blanc) #}
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; height: 110px; min-width: 180px;">
+                        <a href="{{ path('app_cart_remove', {'id': item.product.id, 'size': item.size}) }}" data-turbo="false" class="btn" style="background-color: #ffffff; color: #111; border: 1px solid #111; padding: 10px 20px; font-size: 13px; font-weight: 700; border-radius: 6px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px;">
+                            RETIRER DU PANIER
+                        </a>
+                    </div>
                 </div>
-                
-                <div style="display: flex; gap: 15px;">
-                    <a href="{{ path('app_products') }}" class="btn" style="background-color: #6c757d;">
-                        Continuer mes achats
-                    </a>
+            {% endfor %}
+
+            {# Section Validation globale à droite selon le wireframe #}
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 15px; margin-top: 15px; width: 100%;">
+                {# Ligne 1 : Boîte de Total (gauche) + Finaliser ma commande (droite) #}
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: flex-end;">
+                    <div style="font-size: 18px; font-weight: 700; color: #111; border: 1px solid #111; padding: 12px 30px; background-color: #ffffff; border-radius: 4px; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.5px;">
+                        TOTAL: {{ total|number_format(2, ',', ' ') }} €
+                    </div>
                     
-                    {# Le lien pointe vers notre placeholder de validation avant Stripe #}
-                    <a href="{{ path('app_cart_checkout') }}" data-turbo="false" class="btn" style="background-color: #28a745;">
-                        Finaliser ma commande
+                    <a href="{{ path('app_cart_checkout') }}" data-turbo="false" class="btn" style="background-color: #f8cbd0; color: #111; border: 1px solid #111; padding: 12px 30px; font-size: 14px; font-weight: 700; border-radius: 6px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px;">
+                        FINALISER MA COMMANDE
+                    </a>
+                </div>
+
+                {# Ligne 2 : Bouton Continuer mes achats empilé en dessous #}
+                <div>
+                    <a href="{{ path('app_products') }}" class="btn" style="background-color: #d6ebd3; color: #111; border: 1px solid #111; padding: 12px 30px; font-size: 14px; font-weight: 700; border-radius: 6px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px;">
+                        CONTINUER MES ACHATS
                     </a>
                 </div>
             </div>

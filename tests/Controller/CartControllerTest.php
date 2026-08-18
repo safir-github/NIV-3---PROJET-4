@@ -104,9 +104,9 @@ class CartControllerTest extends WebTestCase
         $this->assertResponseRedirects('/cart');
         $client->followRedirect();
         
-        // Vérifier que le panier affiche le produit
-        $this->assertSelectorTextContains('table', 'Sweat Street');
-        $this->assertSelectorTextContains('table', 'M');
+        // Vérifier que le panier affiche le produit dans le conteneur dédié
+        $this->assertSelectorTextContains('.cart-items-list', 'Sweat Street');
+        $this->assertSelectorTextContains('.cart-items-list', 'M');
 
         // --- ÉTAPE 3 : CLIC SUR FINALISER LA COMMANDE ---
         $client->request('GET', '/cart/checkout');

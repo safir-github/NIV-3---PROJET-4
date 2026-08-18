@@ -83,12 +83,12 @@ class AppFixtures extends Fixture
         // Tailles disponibles pour chaque produit
         $sizes = ['XS', 'S', 'M', 'L', 'XL'];
 
-        foreach ($productsData as $data) {
+        foreach ($productsData as $index => $data) {
             $product = new Product();
             $product->setName($data[0])
                 ->setPrice($data[1])
-                // On associe un nom d'image simple tiré du nom du produit (ex: "street.jpg")
-                ->setImage(strtolower($data[0]) . '.jpg')
+                // On associe l'image officielle tirée du dossier Ressources (ex: "1.jpeg", "2.jpeg")
+                ->setImage(($index + 1) . '.jpeg')
                 ->setIsFeatured($data[2]);
 
             $manager->persist($product);

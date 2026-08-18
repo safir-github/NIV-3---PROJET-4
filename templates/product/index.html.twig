@@ -2,6 +2,51 @@
 
 {% block title %}Boutique - Stubborn{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .price-listbox {
+            border: 1px solid #111;
+            background-color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            align-self: start;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+        }
+        .price-listbox-header {
+            border-bottom: 1px solid #111;
+            padding: 12px 15px;
+            font-weight: 700;
+            text-align: left;
+            background-color: #ffffff;
+            font-size: 15px;
+        }
+        .price-listbox-option {
+            display: block;
+            padding: 12px 15px;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 1px solid #111;
+            color: #555;
+            text-decoration: none;
+            transition: background-color 0.15s;
+        }
+        .price-listbox-option:last-child {
+            border-bottom: none;
+        }
+        .price-listbox-option.active {
+            background-color: #e3f2fd !important;
+            color: #0b5ed7 !important;
+        }
+        .price-listbox-option:hover:not(.active) {
+            background-color: #f8f9fa;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
     <div style="margin-bottom: 40px; text-align: center;">
         <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 20px;">Tous nos Sweat-shirts</h1>
@@ -10,41 +55,45 @@
         <a href="{{ path('app_home') }}" style="color: #666; text-decoration: none; font-size: 14px;">&larr; Retourner à l'accueil</a>
     </div>
 
-    {# Système de filtrage par prix #}
-    <div class="filters-container" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 40px;">
-        <span style="align-self: center; font-weight: 600;">Filtrer par prix :</span>
+    {# Grille unifiée contenant le sélecteur de prix en premier élément selon le wireframe #}
+    <div class="products-grid" style="margin-top: 20px;">
         
-        <a href="{{ path('app_products') }}" class="btn {% if current_filter is empty %}filter-active{% endif %}" style="background-color: {% if current_filter is empty %}#000{% else %}#ccc{% endif %}; color: #fff;">
-            Tous les produits
-        </a>
-        
-        <a href="{{ path('app_products', { 'price_filter': '10-29' }) }}" class="btn {% if current_filter == '10-29' %}filter-active{% endif %}" style="background-color: {% if current_filter == '10-29' %}#000{% else %}#ccc{% endif %}; color: #fff;">
-            10 € à 29 €
-        </a>
-        
-        <a href="{{ path('app_products', { 'price_filter': '29-35' }) }}" class="btn {% if current_filter == '29-35' %}filter-active{% endif %}" style="background-color: {% if current_filter == '29-35' %}#000{% else %}#ccc{% endif %}; color: #fff;">
-            29 € à 35 €
-        </a>
-        
-        <a href="{{ path('app_products', { 'price_filter': '35-50' }) }}" class="btn {% if current_filter == '35-50' %}filter-active{% endif %}" style="background-color: {% if current_filter == '35-50' %}#000{% else %}#ccc{% endif %}; color: #fff;">
-            35 € à 50 €
-        </a>
-    </div>
+        {# 1. Premier élément de la grille : le listbox de filtrage par prix #}
+        <div class="price-listbox">
+            <div class="price-listbox-header">Fourchette de prix</div>
+            
+            <a href="{{ path('app_products') }}" class="price-listbox-option {% if current_filter is empty %}active{% endif %}">
+                Tous les produits
+            </a>
+            
+            <a href="{{ path('app_products', { 'price_filter': '10-29' }) }}" class="price-listbox-option {% if current_filter == '10-29' %}active{% endif %}">
+                10 à 29 €
+            </a>
+            
+            <a href="{{ path('app_products', { 'price_filter': '29-35' }) }}" class="price-listbox-option {% if current_filter == '29-35' %}active{% endif %}">
+                30 à 35 €
+            </a>
+            
+            <a href="{{ path('app_products', { 'price_filter': '35-50' }) }}" class="price-listbox-option {% if current_filter == '35-50' %}active{% endif %}">
+                35 à 50 €
+            </a>
+        </div>
 
-    {# Grille des produits #}
-    <div class="products-grid">
+        {# 2. Reste des éléments : la boucle de produits #}
         {% for product in products %}
-            <div class="product-card">
-                <div>
-                    {# Image du sweat-shirt (avec repli vers un placeholder si l'image physique n'existe pas encore) #}
-                    <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}">
-                    <h3>{{ product.name }}</h3>
-                    <p class="price">{{ product.price|number_format(2, ',', ' ') }} €</p>
-                </div>
+            <div class="product-card" style="text-align: left;">
+                {# Image du sweat-shirt #}
+                <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}" style="width: 100%; display: block; margin-bottom: 15px;">
                 
-                <div>
-                    {# Bouton Voir menant vers la fiche individuelle du produit #}
-                    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn">Voir</a>
+                {# Zone basse : Informations à gauche, Bouton à droite #}
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; margin-top: auto;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 700; margin: 0; color: #111;">{{ product.name }}</h3>
+                        <p class="price" style="font-size: 16px; font-weight: 600; color: #666; margin: 5px 0 0 0;">{{ product.price|number_format(2, ',', ' ') }} €</p>
+                    </div>
+                    <div>
+                        <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn" style="padding: 8px 18px; font-size: 13px; text-transform: uppercase;">Voir</a>
+                    </div>
                 </div>
             </div>
         {% else %}

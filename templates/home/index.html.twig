@@ -23,26 +23,22 @@
         
         <div class="products-grid">
             {% for product in featured_products %}
-                <div class="product-card">
-                    <div>
-                        {# Image du produit (les images fictives seront stockées dans public/images/) #}
-                        {# Pour l'instant, on met un placeholder d'image si l'image n'est pas encore présente #}
-                        <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}">
-                        <h3>{{ product.name }}</h3>
-                        <p class="price">{{ product.price|number_format(2, ',', ' ') }} €</p>
-                    </div>
+                <div class="product-card" style="text-align: left;">
+                    {# Image du produit #}
+                    <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}" style="width: 100%; display: block; margin-bottom: 15px;">
                     
-                    {# 
-                        Consigne : "Si l’utilisateur n’est pas connecté les boutons « Voir » des produits mis en avant n’apparaissent pas"
-                        Nous vérifions donc si l'utilisateur est connecté (app.user) avant d'afficher le bouton.
-                    #}
-                    {% if app.user %}
+                    {# Zone basse : Infos à gauche, Bouton "Voir" à droite si connecté #}
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; margin-top: auto;">
                         <div>
-                            {# Lien vers la fiche produit. Pour l'instant, la route prend l'identifiant du produit #}
-                            {# Comme nous n'avons pas encore créé cette route finale, on pointe vers un hashtag pour ne pas planter #}
-                            <a href="#" class="btn">Voir</a>
+                            <h3 style="font-size: 18px; font-weight: 700; margin: 0; color: #111;">{{ product.name }}</h3>
+                            <p class="price" style="font-size: 16px; font-weight: 600; color: #666; margin: 5px 0 0 0;">{{ product.price|number_format(2, ',', ' ') }} €</p>
                         </div>
-                    {% endif %}
+                        {% if app.user %}
+                            <div>
+                                <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn" style="padding: 8px 18px; font-size: 13px; text-transform: uppercase;">Voir</a>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             {% else %}
                 <p style="text-align: center; color: #777; grid-column: 1 / -1;">Aucun produit mis en avant pour le moment.</p>

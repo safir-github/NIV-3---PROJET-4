@@ -3,48 +3,63 @@
 {% block title %}Connexion{% endblock %}
 
 {% block body %}
-    <form method="post">
-        {# Affiche les erreurs de connexion (ex: identifiants incorrects) #}
-        {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
+    <div style="max-width: 400px; margin: 40px auto; background-color: #ffffff; border: 1px solid #ccc; padding: 30px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+        <form method="post">
+            {# Titre avec soulignement bleu clair #}
+            <h2 style="font-size: 20px; font-weight: 700; margin: 0 0 10px 0; color: #333; text-align: left; font-family: 'Inter', sans-serif;">Se connecter</h2>
+            <div style="height: 2px; background-color: #e3f2fd; margin-bottom: 20px; width: 100%;"></div>
 
-        {# Si l'utilisateur est déjà connecté, on affiche son identifiant et un bouton de déconnexion #}
-        {% if app.user %}
-            <div class="mb-3">
-                Vous êtes connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Se déconnecter</a>
+            {# Affiche les erreurs de connexion #}
+            {% if error %}
+                <div class="alert alert-danger" style="margin-bottom: 15px; padding: 10px; border-radius: 4px; font-size: 14px;">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            {# Si l'utilisateur est déjà connecté #}
+            {% if app.user %}
+                <div style="margin-bottom: 15px; padding: 10px; background-color: #e2f0d9; color: #385723; border-radius: 4px; font-size: 14px;">
+                    Vous êtes connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}" style="text-decoration: underline; color: inherit; font-weight: bold;">Se déconnecter</a>
+                </div>
+            {% endif %}
+
+            {# Nom utilisateur #}
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label for="username" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 5px; color: #555; font-family: 'Inter', sans-serif;">Nom utilisateur :</label>
+                <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" placeholder="johndoe" autocomplete="email" required autofocus style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
             </div>
-        {% endif %}
 
-        <h1 class="h3 mb-3 font-weight-normal">Connexion</h1>
-        
-        <label for="username">Adresse email</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-        
-        <label for="password">Mot de passe</label>
-        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
-        
-        {# Jeton CSRF pour protéger le formulaire contre les failles CSRF #}
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
-
-        {# 
-            Si on veut activer le "Se souvenir de moi" (remember me) plus tard, 
-            il suffira de décommenter ce bloc et de le configurer dans security.yaml
-            
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Se souvenir de moi</label>
+            {# Mot de passe #}
+            <div style="margin-bottom: 20px; text-align: left;">
+                <label for="password" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 5px; color: #555; font-family: 'Inter', sans-serif;">Mot de passe :</label>
+                <input type="password" name="_password" id="password" class="form-control" placeholder="********" autocomplete="current-password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
             </div>
-        #}
 
-        <button class="btn btn-lg btn-primary" type="submit">
-            Se connecter
-        </button>
+            {# Jeton CSRF #}
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-        <div class="mt-4">
-            <a href="{{ path('app_register') }}">Pas encore inscrit ? Créer un compte</a>
-            <br>
-            <a href="{{ path('app_home') }}">Retourner à l'accueil</a>
-        </div>
-    </form>
+            {# Bouton Se Connecter #}
+            <div style="text-align: left; margin-bottom: 15px;">
+                <button class="btn" type="submit" style="background-color: #54b4ff; color: #fff; border: none; padding: 12px 30px; font-size: 16px; font-weight: 700; border-radius: 6px; cursor: pointer; text-shadow: 0 1px 1px rgba(0,0,0,0.1); width: auto;">
+                    Se Connecter
+                </button>
+            </div>
+
+            {# Lien Mot de passe oublié #}
+            <div style="text-align: left; margin-bottom: 25px;">
+                <a href="#" onclick="alert('Fonctionnalité de démonstration : réinitialisation non configurée.'); return false;" style="font-size: 14px; color: #739dfb; text-decoration: underline; font-family: 'Inter', sans-serif;">
+                    Mot de passe oublié
+                </a>
+            </div>
+
+            {# Séparateur bleu #}
+            <div style="height: 2px; background-color: #e3f2fd; margin-bottom: 20px; width: 100%;"></div>
+
+            {# Inscription #}
+            <div style="text-align: left;">
+                <p style="margin: 0 0 10px 0; font-weight: 600; font-size: 14px; color: #555; font-family: 'Inter', sans-serif;">Pas encore inscrit ?</p>
+                <a href="{{ path('app_register') }}" class="btn" style="background-color: #54b4ff; color: #fff; padding: 12px 30px; font-size: 16px; font-weight: 700; border-radius: 6px; display: inline-block; text-decoration: none; text-shadow: 0 1px 1px rgba(0,0,0,0.1); text-align: center; width: auto; box-sizing: border-box;">
+                    Créer un compte
+                </a>
+            </div>
+        </form>
+    </div>
 {% endblock %}

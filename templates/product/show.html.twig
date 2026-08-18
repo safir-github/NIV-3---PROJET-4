@@ -2,6 +2,64 @@
 
 {% block title %}{{ product.name }} - Stubborn{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .size-listbox {
+            border: 1px solid #111;
+            width: 220px;
+            background-color: #ffffff;
+            margin-bottom: 25px;
+            font-family: 'Inter', sans-serif;
+        }
+        .size-listbox-header {
+            border-bottom: 1px solid #111;
+            padding: 10px 15px;
+            font-weight: 700;
+            text-align: center;
+            background-color: #ffffff;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .size-listbox-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            font-weight: 600;
+            font-size: 15px;
+            border-bottom: 1px solid #111;
+            cursor: pointer;
+            background-color: #ffffff;
+            color: #111;
+            transition: background-color 0.15s;
+        }
+        .size-listbox-option:last-child {
+            border-bottom: none;
+        }
+        .size-listbox-option:has(input[type="radio"]:checked) {
+            background-color: #e3f2fd !important;
+            color: #0b5ed7 !important;
+        }
+        .size-listbox-option-disabled {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            font-weight: 600;
+            font-size: 15px;
+            border-bottom: 1px solid #111;
+            background-color: #fafafa !important;
+            color: #ccc !important;
+            cursor: not-allowed !important;
+        }
+        .size-listbox-option-disabled:last-child {
+            border-bottom: none;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
     <div style="margin-bottom: 20px;">
         <a href="{{ path('app_products') }}" style="color: #666; text-decoration: none; font-size: 14px;">&larr; Retourner à la boutique</a>
@@ -14,15 +72,16 @@
         </div>
 
         {# Partie droite : Informations et Formulaire de sélection de taille #}
-        <div class="product-info" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-            <h1 style="font-size: 36px; font-weight: 700; margin: 0 0 10px 0;">{{ product.name }}</h1>
-            <p class="price" style="font-size: 28px; font-weight: 600; color: #111; margin: 0 0 30px 0;">{{ product.price|number_format(2, ',', ' ') }} €</p>
+        <div class="product-info" style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding-left: 20px;">
+            <h1 style="font-size: 36px; font-weight: 700; margin: 0 0 10px 0; color: #111;">{{ product.name }}</h1>
+            <p class="price" style="font-size: 28px; font-weight: 600; color: #666; margin: 0 0 35px 0;">{{ product.price|number_format(2, ',', ' ') }} €</p>
 
             {# Formulaire d'ajout au panier #}
-            <form action="{{ path('app_cart_add', {'id': product.id}) }}" method="post" data-turbo="false" style="margin-top: 20px;">
-                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">Sélectionnez une taille :</h3>
+            <form action="{{ path('app_cart_add', {'id': product.id}) }}" method="post" data-turbo="false" style="margin: 0; width: 100%; display: flex; flex-direction: column; align-items: flex-start;">
                 
-                <div class="sizes-container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;">
+                <div class="size-listbox">
+                    <div class="size-listbox-header">Taille</div>
+                    
                     {# Liste des tailles standards requises par le brief #}
                     {% for size in ['XS', 'S', 'M', 'L', 'XL'] %}
                         {# Recherche de l'entité stock correspondante pour cette taille #}
@@ -37,23 +96,23 @@
                         {% set is_available = stock_item is not null and stock_item.quantity > 0 %}
                         {% set quantity = stock_item is not null ? stock_item.quantity : 0 %}
 
-                        <label class="size-option" style="display: flex; align-items: center; gap: 10px; padding: 10px 15px; border: 1px solid {% if is_available %}#ddd{% else %}#eee{% endif %}; border-radius: 6px; cursor: {% if is_available %}pointer{% else %}not-allowed{% endif %}; background-color: {% if not is_available %}#fafafa{% else %}#fff{% endif %}; color: {% if not is_available %}#aaa{% else %}#333{% endif %};">
-                            <input type="radio" name="size" value="{{ size }}" {% if not is_available %}disabled{% endif %} required style="cursor: {% if is_available %}pointer{% else %}not-allowed{% endif %};">
-                            <span style="font-weight: 600; width: 30px;">{{ size }}</span>
-                            
-                            <span style="font-size: 14px; margin-left: auto;">
-                                {% if is_available %}
-                                    <span style="color: #28a745;">En stock ({{ quantity }} disponibles)</span>
-                                {% else %}
-                                    <span style="color: #dc3545; font-style: italic;">Rupture de stock</span>
-                                {% endif %}
-                            </span>
-                        </label>
+                        {% if is_available %}
+                            <label class="size-listbox-option">
+                                <input type="radio" name="size" value="{{ size }}" required style="display: none;">
+                                <span>{{ size }}</span>
+                                <span style="font-size: 12px; color: #28a745;">En stock ({{ quantity }})</span>
+                            </label>
+                        {% else %}
+                            <div class="size-listbox-option-disabled">
+                                <span>{{ size }}</span>
+                                <span style="font-size: 12px; color: #dc3545; font-style: italic;">Rupture</span>
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
 
                 {# Bouton d'ajout au panier #}
-                <button type="submit" class="btn" style="width: 100%; padding: 15px; font-size: 18px; border-radius: 6px;">
+                <button type="submit" class="btn" style="width: 220px; padding: 14px; font-size: 15px; border-radius: 6px; border: 1px solid #111; background-color: #ffffff; color: #111; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; text-align: center; box-sizing: border-box;">
                     Ajouter au panier
                 </button>
             </form>
