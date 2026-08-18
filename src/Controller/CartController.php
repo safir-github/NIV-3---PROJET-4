@@ -4,28 +4,37 @@ namespace App\Controller;
 
 use App\Repository\ProductRepository;
 use App\Service\CartService;
+use App\Service\StripeService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Contrôleur du Panier (CartController)
  * 
- * Ce contrôleur gère :
- * - L'affichage du panier d'achat (`/cart`).
- * - L'ajout d'un produit avec sa taille (`/cart/add/{id}`).
- * - La suppression d'un produit spécifique (`/cart/remove/{id}/{size}`).
+ * Ce contrôleur gère toutes les étapes du panier d'achat, du tunnel de validation
+ * et de la finalisation du paiement via l'intégration Stripe.
  */
 class CartController extends AbstractController
 {
     private CartService $cartService;
     private ProductRepository $productRepository;
+    private StripeService $stripeService;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(CartService $cartService, ProductRepository $productRepository)
-    {
+    public function __construct(
+        CartService $cartService, 
+        ProductRepository $productRepository,
+        StripeService $stripeService,
+        EntityManagerInterface $entityManager
+    ) {
         $this->cartService = $cartService;
         $this->productRepository = $productRepository;
+        $this->stripeService = $stripeService;
+        $this->entityManager = $entityManager;
     }
 
     #[Route('/cart', name: 'app_cart')]
@@ -78,7 +87,7 @@ class CartController extends AbstractController
 
         $this->addFlash('success', sprintf('Le sweat-shirt %s (taille %s) a été ajouté à votre panier.', $product->getName(), $size));
 
-        // Redirection classique vers la page du panier (gérée proprement par Turbo)
+        // Redirection classique vers la page du panier
         return $this->redirectToRoute('app_cart');
     }
 
@@ -95,9 +104,89 @@ class CartController extends AbstractController
     }
 
     #[Route('/cart/checkout', name: 'app_cart_checkout')]
-    public function checkoutPlaceholder(): Response
+    public function checkout(): Response
     {
-        // Page temporaire en attendant l'intégration de Stripe
-        return new Response('<html><body><h1>Paiement & Intégration Stripe (Phase 6)</h1><p>Cette page est en cours de développement. Le module de paiement test par Stripe sera implémenté à la prochaine étape !</p><a href="/cart">Retourner au panier</a></body></html>');
+        $cartItems = $this->cartService->getDetailedCart();
+
+        // Style défensif : si le panier est vide, impossible de payer
+        if (empty($cartItems)) {
+            $this->addFlash('error', 'Votre panier est vide. Ajoutez des articles avant de finaliser la commande.');
+            return $this->redirectToRoute('app_cart');
+        }
+
+        // Génération des URL absolues de retour pour Stripe
+        $successUrl = $this->generateUrl('app_cart_success', [], UrlGeneratorInterface::ABSOLUTE_URL) . '?session_id={CHECKOUT_SESSION_ID}';
+        $cancelUrl = $this->generateUrl('app_cart_cancel', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        // Création de la session Checkout via notre service Stripe
+        $checkoutUrl = $this->stripeService->createCheckoutSession($cartItems, $successUrl, $cancelUrl);
+
+        // Redirection de l'utilisateur vers le portail Stripe sécurisé
+        return $this->redirect($checkoutUrl);
+    }
+
+    #[Route('/cart/success', name: 'app_cart_success')]
+    public function success(Request $request): Response
+    {
+        $sessionId = $request->query->get('session_id');
+
+        // Style défensif : s'assurer qu'un ID de session Stripe valide est transmis
+        if (!$sessionId) {
+            $this->addFlash('error', 'Session de paiement invalide.');
+            return $this->redirectToRoute('app_cart');
+        }
+
+        try {
+            // Récupération de la session de paiement depuis l'API de Stripe
+            $session = $this->stripeService->retrieveSession($sessionId);
+
+            // Vérification stricte du statut du paiement
+            if ($session->payment_status !== 'paid') {
+                $this->addFlash('error', 'Le paiement n\'a pas pu être validé par Stripe.');
+                return $this->redirectToRoute('app_cart');
+            }
+
+            // Récupération du panier détaillé actuel pour décrémenter les stocks physiques
+            $cartItems = $this->cartService->getDetailedCart();
+
+            if (!empty($cartItems)) {
+                // Parcourir les articles achetés et décrémenter les stocks correspondants en base
+                foreach ($cartItems as $item) {
+                    $product = $item['product'];
+                    $purchasedSize = $item['size'];
+                    $quantityPurchased = $item['quantity'];
+
+                    // Recherche de la ligne de stock pour le produit et la taille achetés
+                    foreach ($product->getStocks() as $stock) {
+                        if ($stock->getSize() === $purchasedSize) {
+                            $newQuantity = $stock->getQuantity() - $quantityPurchased;
+                            // Style défensif : on s'assure que le stock ne devienne pas négatif
+                            $stock->setQuantity(max(0, $newQuantity));
+                            $this->entityManager->persist($stock);
+                        }
+                    }
+                }
+
+                // Sauvegarde de la mise à jour des stocks en BDD
+                $this->entityManager->flush();
+
+                // On vide le panier en session maintenant que l'achat est validé et les stocks ajustés
+                $this->cartService->clear();
+            }
+
+            // Rendu de la page de confirmation de commande
+            return $this->render('cart/success.html.twig');
+
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue lors de la validation du paiement : ' . $e->getMessage());
+            return $this->redirectToRoute('app_cart');
+        }
+    }
+
+    #[Route('/cart/cancel', name: 'app_cart_cancel')]
+    public function cancel(): Response
+    {
+        // Rendu de la page d'annulation
+        return $this->render('cart/cancel.html.twig');
     }
 }

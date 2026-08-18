@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement Annulé - Stubborn{% endblock %}
+
+{% block body %}
+    <div style="text-align: center; max-width: 600px; margin: 60px auto; padding: 40px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        {# Icône d'erreur orange/rouge #}
+        <div style="width: 80px; height: 80px; background-color: #fff3cd; color: #856404; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px auto; font-size: 40px; font-weight: 700;">
+            !
+        </div>
+
+        <h1 style="font-size: 32px; font-weight: 700; color: #856404; margin-bottom: 20px;">Paiement Annulé</h1>
+        
+        <p style="font-size: 16px; color: #666; line-height: 1.6; margin-bottom: 30px;">
+            La transaction a été interrompue ou annulée sur la page de paiement sécurisé Stripe. Aucune somme n'a été débitée de votre compte. Votre panier reste inchangé.
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 40px;">
+            <a href="{{ path('app_cart') }}" class="btn" style="background-color: #000; padding: 12px 30px; font-size: 16px; border-radius: 6px;">
+                Retourner à mon panier
+            </a>
+            <a href="{{ path('app_products') }}" class="btn" style="background-color: #6c757d; padding: 12px 30px; font-size: 16px; border-radius: 6px;">
+                Retourner à la boutique
+            </a>
+        </div>
+    </div>
+{% endblock %}
