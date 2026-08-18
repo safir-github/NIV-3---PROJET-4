@@ -10,47 +10,52 @@
         <a href="{{ path('app_home') }}" style="color: #666; text-decoration: none; font-size: 14px;">&larr; Retourner à l'accueil</a>
     </div>
 
-    {# Système de filtrage par prix #}
-    <div class="filters-container" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 40px;">
-        <span style="align-self: center; font-weight: 600;">Filtrer par prix :</span>
-        
-        <a href="{{ path('app_products') }}" class="btn {% if current_filter is empty %}filter-active{% endif %}" style="background-color: {% if current_filter is empty %}#000{% else %}#ccc{% endif %}; color: #fff;">
-            Tous les produits
-        </a>
-        
-        <a href="{{ path('app_products', { 'price_filter': '10-29' }) }}" class="btn {% if current_filter == '10-29' %}filter-active{% endif %}" style="background-color: {% if current_filter == '10-29' %}#000{% else %}#ccc{% endif %}; color: #fff;">
-            10 € à 29 €
-        </a>
-        
-        <a href="{{ path('app_products', { 'price_filter': '29-35' }) }}" class="btn {% if current_filter == '29-35' %}filter-active{% endif %}" style="background-color: {% if current_filter == '29-35' %}#000{% else %}#ccc{% endif %}; color: #fff;">
-            29 € à 35 €
-        </a>
-        
-        <a href="{{ path('app_products', { 'price_filter': '35-50' }) }}" class="btn {% if current_filter == '35-50' %}filter-active{% endif %}" style="background-color: {% if current_filter == '35-50' %}#000{% else %}#ccc{% endif %}; color: #fff;">
-            35 € à 50 €
-        </a>
-    </div>
-
-    {# Grille des produits #}
-    <div class="products-grid">
-        {% for product in products %}
-            <div class="product-card">
-                <div>
-                    {# Image du sweat-shirt (avec repli vers un placeholder si l'image physique n'existe pas encore) #}
-                    <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}">
-                    <h3>{{ product.name }}</h3>
-                    <p class="price">{{ product.price|number_format(2, ',', ' ') }} €</p>
-                </div>
+    <div style="display: flex; gap: 30px; align-items: flex-start; margin-top: 20px;">
+        {# Colonne de gauche : Filtres par prix vertical selon le wireframe #}
+        <div class="filters-sidebar" style="width: 250px; flex-shrink: 0; background-color: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
+            <h3 style="font-size: 16px; font-weight: 700; margin: 0 0 15px 0; border-bottom: 2px solid #f2f2f2; padding-bottom: 10px; color: #111;">Fourchette de prix</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <a href="{{ path('app_products') }}" class="btn" style="text-align: left; display: block; background-color: {% if current_filter is empty %}#007bff{% else %}#f8f9fa{% endif %}; color: {% if current_filter is empty %}#fff{% else %}#333{% endif %}; border: 1px solid #ddd; padding: 10px 15px; border-radius: 4px; font-weight: 600; text-decoration: none; font-size: 14px;">
+                    Tous les produits
+                </a>
                 
-                <div>
-                    {# Bouton Voir menant vers la fiche individuelle du produit #}
-                    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn">Voir</a>
-                </div>
+                <a href="{{ path('app_products', { 'price_filter': '10-29' }) }}" class="btn" style="text-align: left; display: block; background-color: {% if current_filter == '10-29' %}#007bff{% else %}#f8f9fa{% endif %}; color: {% if current_filter == '10-29' %}#fff{% else %}#333{% endif %}; border: 1px solid #ddd; padding: 10px 15px; border-radius: 4px; font-weight: 600; text-decoration: none; font-size: 14px;">
+                    10 € à 29 €
+                </a>
+                
+                <a href="{{ path('app_products', { 'price_filter': '29-35' }) }}" class="btn" style="text-align: left; display: block; background-color: {% if current_filter == '29-35' %}#007bff{% else %}#f8f9fa{% endif %}; color: {% if current_filter == '29-35' %}#fff{% else %}#333{% endif %}; border: 1px solid #ddd; padding: 10px 15px; border-radius: 4px; font-weight: 600; text-decoration: none; font-size: 14px;">
+                    29 € à 35 €
+                </a>
+                
+                <a href="{{ path('app_products', { 'price_filter': '35-50' }) }}" class="btn" style="text-align: left; display: block; background-color: {% if current_filter == '35-50' %}#007bff{% else %}#f8f9fa{% endif %}; color: {% if current_filter == '35-50' %}#fff{% else %}#333{% endif %}; border: 1px solid #ddd; padding: 10px 15px; border-radius: 4px; font-weight: 600; text-decoration: none; font-size: 14px;">
+                    35 € à 50 €
+                </a>
             </div>
-        {% else %}
-            <p style="text-align: center; color: #777; grid-column: 1 / -1; font-size: 18px; margin-top: 40px;">
-                Aucun sweat-shirt ne correspond à cette tranche de prix.
-            </p>
-        {% endfor %}
+        </div>
+
+        {# Colonne de droite : Grille des produits #}
+        <div style="flex-grow: 1;">
+            <div class="products-grid" style="margin-top: 0;">
+                {% for product in products %}
+                    <div class="product-card">
+                        <div>
+                            {# Image du sweat-shirt (avec repli vers un placeholder si l'image physique n'existe pas encore) #}
+                            <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}">
+                            <h3>{{ product.name }}</h3>
+                            <p class="price">{{ product.price|number_format(2, ',', ' ') }} €</p>
+                        </div>
+                        
+                        <div>
+                            {# Bouton Voir menant vers la fiche individuelle du produit #}
+                            <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn">Voir</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <p style="text-align: center; color: #777; grid-column: 1 / -1; font-size: 18px; margin-top: 40px;">
+                        Aucun sweat-shirt ne correspond à cette tranche de prix.
+                    </p>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 {% endblock %}
