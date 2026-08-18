@@ -32,8 +32,10 @@
 
         <header class="main-header">
             <nav class="navbar">
-                <div class="logo">
-                    <a href="{{ path('app_home') }}">Stubborn</a>
+                <div class="logo" style="display: flex; align-items: center;">
+                    <a href="{{ path('app_home') }}" style="display: flex; align-items: center; text-decoration: none;">
+                        <img src="{{ asset('images/Logo.png') }}" alt="Stubborn" style="height: 60px; width: auto; object-fit: contain;">
+                    </a>
                 </div>
                 <ul class="nav-links">
                     {# Lien Accueil présent pour tout le monde #}
