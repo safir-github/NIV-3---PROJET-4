@@ -32,9 +32,10 @@
 
         <header class="main-header">
             <nav class="navbar">
-                <div class="logo" style="display: flex; align-items: center;">
-                    <a href="{{ path('app_home') }}" style="display: flex; align-items: center; text-decoration: none;">
-                        <img src="{{ asset('images/Logo.png') }}" alt="Stubborn" style="height: 60px; width: auto; object-fit: contain;">
+                <div class="logo" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+                    <a href="{{ path('app_home') }}" style="display: flex; flex-direction: column; align-items: flex-start; text-decoration: none;">
+                        <img src="{{ asset('images/Logo.png') }}" alt="Stubborn" style="height: 75px; width: auto; object-fit: contain;">
+                        <span style="font-size: 11px; color: #666; font-weight: 600; margin-top: 4px; font-style: italic; font-family: 'Inter', sans-serif;">Don't compromise on your look</span>
                     </a>
                 </div>
                 <ul class="nav-links">
