@@ -21,8 +21,11 @@
 
         <button type="submit" class="btn">S'inscrire</button>
 
-        <div class="mt-4">
-            <a href="{{ path('app_login') }}">Déjà inscrit ? Se connecter</a>
+        <div class="mt-4" style="border-top: 1px solid #eee; padding-top: 20px;">
+            <p style="margin-bottom: 10px; font-weight: 600;">Déjà inscrit ?</p>
+            <a href="{{ path('app_login') }}" class="btn" style="background-color: #007bff; color: #fff; display: inline-block;">
+                Se connecter
+            </a>
         </div>
     {{ form_end(registrationForm) }}
 {% endblock %}

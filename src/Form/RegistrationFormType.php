@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -63,13 +64,15 @@ class RegistrationFormType extends AbstractType
                     ),
                 ],
             ])
-            // Champ Mot de passe
-            ->add('plainPassword', PasswordType::class, [
-                'label' => 'Mot de passe',
-                // mapped => false indique que ce champ n'est pas directement enregistré tel quel en BDD.
-                // Le mot de passe en clair sera récupéré et haché dans le contrôleur.
+            // Champ Mot de passe répété pour confirmation
+            ->add('plainPassword', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'invalid_message' => 'Les deux mots de passe doivent correspondre.',
+                'options' => ['attr' => ['class' => 'password-field', 'autocomplete' => 'new-password']],
+                'required' => true,
+                'first_options'  => ['label' => 'Mot de passe'],
+                'second_options' => ['label' => 'Confirmer le mot de passe'],
                 'mapped' => false,
-                'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank(
                         message: 'Veuillez saisir un mot de passe.'
@@ -77,7 +80,6 @@ class RegistrationFormType extends AbstractType
                     new Length(
                         min: 6,
                         minMessage: 'Votre mot de passe doit faire au moins {{ limit }} caractères.',
-                        // longueur maximale autorisée pour des raisons de sécurité
                         max: 4096
                     ),
                 ],
