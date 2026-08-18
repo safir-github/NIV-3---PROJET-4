@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Panier - Stubborn{% endblock %}
+
+{% block body %}
+    <div style="margin-bottom: 40px; text-align: center;">
+        <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 10px;">Votre Panier</h1>
+        <p style="color: #666; font-size: 14px;">Consultez et finalisez vos achats de sweat-shirts premium.</p>
+    </div>
+
+    {% if cart_items|length > 0 %}
+        {# Table récapitulative des articles dans le panier #}
+        <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #eee; padding-bottom: 15px; font-weight: 600; color: #555;">
+                        <th style="padding: 15px 0;">Produit</th>
+                        <th style="padding: 15px 0;">Taille</th>
+                        <th style="padding: 15px 0; text-align: center;">Quantité</th>
+                        <th style="padding: 15px 0; text-align: right;">Prix Unitaire</th>
+                        <th style="padding: 15px 0; text-align: right;">Sous-total</th>
+                        <th style="padding: 15px 0; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                        <tr style="border-bottom: 1px solid #f2f2f2; font-size: 16px;">
+                            {# Nom du produit et Image #}
+                            <td style="padding: 20px 0; display: flex; align-items: center; gap: 15px;">
+                                <img src="{{ asset('images/' ~ item.product.image) }}" onerror="this.src='https://placehold.co/80x90?text={{ item.product.name }}';" alt="{{ item.product.name }}" style="width: 60px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #eee;">
+                                <span style="font-weight: 600; color: #111;">{{ item.product.name }}</span>
+                            </td>
+                            
+                            {# Taille sélectionnée #}
+                            <td style="padding: 20px 0; font-weight: 600;">{{ item.size }}</td>
+                            
+                            {# Quantité #}
+                            <td style="padding: 20px 0; text-align: center;">{{ item.quantity }}</td>
+                            
+                            {# Prix Unitaire #}
+                            <td style="padding: 20px 0; text-align: right;">{{ item.product.price|number_format(2, ',', ' ') }} €</td>
+                            
+                            {# Sous-total #}
+                            <td style="padding: 20px 0; text-align: right; font-weight: 600;">{{ item.sub_total|number_format(2, ',', ' ') }} €</td>
+                            
+                            {# Bouton Supprimer #}
+                            <td style="padding: 20px 0; text-align: right;">
+                                {# data-turbo="false" pour forcer un rechargement classique sécurisé sans interférence de Turbo #}
+                                <a href="{{ path('app_cart_remove', {'id': item.product.id, 'size': item.size}) }}" data-turbo="false" style="color: #dc3545; text-decoration: none; font-size: 14px; font-weight: 600;">
+                                    Retirer
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {# Section Total et Validation #}
+            <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">
+                <div style="font-size: 22px; font-weight: 700; margin-bottom: 20px; color: #111;">
+                    Total : {{ total|number_format(2, ',', ' ') }} €
+                </div>
+                
+                <div style="display: flex; gap: 15px;">
+                    <a href="{{ path('app_products') }}" class="btn" style="background-color: #6c757d;">
+                        Continuer mes achats
+                    </a>
+                    
+                    {# Le lien pointe vers notre placeholder de validation avant Stripe #}
+                    <a href="{{ path('app_cart_checkout') }}" data-turbo="false" class="btn" style="background-color: #28a745;">
+                        Finaliser ma commande
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        {# Panier vide #}
+        <div style="text-align: center; padding: 60px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+            <p style="font-size: 18px; color: #777; margin-bottom: 30px;">Votre panier est actuellement vide.</p>
+            <a href="{{ path('app_products') }}" class="btn">
+                Aller sur la boutique
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}
