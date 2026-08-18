@@ -58,8 +58,16 @@ class ProductController extends AbstractController
     #[Route('/product/{id}', name: 'app_product_show')]
     public function show(int $id): Response
     {
-        // Route placeholder pour la fiche individuelle du sweat-shirt.
-        // Elle sera pleinement implémentée dans la phase suivante.
-        return new Response('<html><body>Fiche du produit ID : ' . $id . ' (En cours de développement)</body></html>');
+        // Recherche du produit en base de données par son ID
+        $product = $this->productRepository->find($id);
+
+        // Style défensif : si le produit n'existe pas en BDD, on renvoie immédiatement une erreur 404
+        if (!$product) {
+            throw $this->createNotFoundException('Le sweat-shirt demandé n\'existe pas.');
+        }
+
+        return $this->render('product/show.html.twig', [
+            'product' => $product,
+        ]);
     }
 }
