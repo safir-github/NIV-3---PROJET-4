@@ -2,6 +2,51 @@
 
 {% block title %}Boutique - Stubborn{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .price-listbox {
+            border: 1px solid #111;
+            background-color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            align-self: start;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+        }
+        .price-listbox-header {
+            border-bottom: 1px solid #111;
+            padding: 12px 15px;
+            font-weight: 700;
+            text-align: left;
+            background-color: #ffffff;
+            font-size: 15px;
+        }
+        .price-listbox-option {
+            display: block;
+            padding: 12px 15px;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 1px solid #111;
+            color: #555;
+            text-decoration: none;
+            transition: background-color 0.15s;
+        }
+        .price-listbox-option:last-child {
+            border-bottom: none;
+        }
+        .price-listbox-option.active {
+            background-color: #e3f2fd !important;
+            color: #0b5ed7 !important;
+        }
+        .price-listbox-option:hover:not(.active) {
+            background-color: #f8f9fa;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
     <div style="margin-bottom: 40px; text-align: center;">
         <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 20px;">Tous nos Sweat-shirts</h1>
@@ -10,54 +55,51 @@
         <a href="{{ path('app_home') }}" style="color: #666; text-decoration: none; font-size: 14px;">&larr; Retourner à l'accueil</a>
     </div>
 
-    <div style="display: flex; gap: 30px; align-items: flex-start; margin-top: 20px;">
-        {# Colonne de gauche : Filtres par prix vertical selon le wireframe #}
-        <div class="filters-sidebar" style="width: 250px; flex-shrink: 0; background-color: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
-            <h3 style="font-size: 16px; font-weight: 700; margin: 0 0 15px 0; border-bottom: 2px solid #f2f2f2; padding-bottom: 10px; color: #111;">Fourchette de prix</h3>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <a href="{{ path('app_products') }}" class="btn" style="text-align: left; display: block; background-color: {% if current_filter is empty %}#007bff{% else %}#f8f9fa{% endif %}; color: {% if current_filter is empty %}#fff{% else %}#333{% endif %}; border: 1px solid #ddd; padding: 10px 15px; border-radius: 4px; font-weight: 600; text-decoration: none; font-size: 14px;">
-                    Tous les produits
-                </a>
-                
-                <a href="{{ path('app_products', { 'price_filter': '10-29' }) }}" class="btn" style="text-align: left; display: block; background-color: {% if current_filter == '10-29' %}#007bff{% else %}#f8f9fa{% endif %}; color: {% if current_filter == '10-29' %}#fff{% else %}#333{% endif %}; border: 1px solid #ddd; padding: 10px 15px; border-radius: 4px; font-weight: 600; text-decoration: none; font-size: 14px;">
-                    10 € à 29 €
-                </a>
-                
-                <a href="{{ path('app_products', { 'price_filter': '29-35' }) }}" class="btn" style="text-align: left; display: block; background-color: {% if current_filter == '29-35' %}#007bff{% else %}#f8f9fa{% endif %}; color: {% if current_filter == '29-35' %}#fff{% else %}#333{% endif %}; border: 1px solid #ddd; padding: 10px 15px; border-radius: 4px; font-weight: 600; text-decoration: none; font-size: 14px;">
-                    29 € à 35 €
-                </a>
-                
-                <a href="{{ path('app_products', { 'price_filter': '35-50' }) }}" class="btn" style="text-align: left; display: block; background-color: {% if current_filter == '35-50' %}#007bff{% else %}#f8f9fa{% endif %}; color: {% if current_filter == '35-50' %}#fff{% else %}#333{% endif %}; border: 1px solid #ddd; padding: 10px 15px; border-radius: 4px; font-weight: 600; text-decoration: none; font-size: 14px;">
-                    35 € à 50 €
-                </a>
-            </div>
+    {# Grille unifiée contenant le sélecteur de prix en premier élément selon le wireframe #}
+    <div class="products-grid" style="margin-top: 20px;">
+        
+        {# 1. Premier élément de la grille : le listbox de filtrage par prix #}
+        <div class="price-listbox">
+            <div class="price-listbox-header">Fourchette de prix</div>
+            
+            <a href="{{ path('app_products') }}" class="price-listbox-option {% if current_filter is empty %}active{% endif %}">
+                Tous les produits
+            </a>
+            
+            <a href="{{ path('app_products', { 'price_filter': '10-29' }) }}" class="price-listbox-option {% if current_filter == '10-29' %}active{% endif %}">
+                10 à 29 €
+            </a>
+            
+            <a href="{{ path('app_products', { 'price_filter': '29-35' }) }}" class="price-listbox-option {% if current_filter == '29-35' %}active{% endif %}">
+                30 à 35 €
+            </a>
+            
+            <a href="{{ path('app_products', { 'price_filter': '35-50' }) }}" class="price-listbox-option {% if current_filter == '35-50' %}active{% endif %}">
+                35 à 50 €
+            </a>
         </div>
 
-        {# Colonne de droite : Grille des produits #}
-        <div style="flex-grow: 1;">
-            <div class="products-grid" style="margin-top: 0;">
-                {% for product in products %}
-                    <div class="product-card" style="text-align: left;">
-                        {# Image du sweat-shirt #}
-                        <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}" style="width: 100%; display: block; margin-bottom: 15px;">
-                        
-                        {# Zone basse : Informations à gauche, Bouton à droite #}
-                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; margin-top: auto;">
-                            <div>
-                                <h3 style="font-size: 18px; font-weight: 700; margin: 0; color: #111;">{{ product.name }}</h3>
-                                <p class="price" style="font-size: 16px; font-weight: 600; color: #666; margin: 5px 0 0 0;">{{ product.price|number_format(2, ',', ' ') }} €</p>
-                            </div>
-                            <div>
-                                <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn" style="padding: 8px 18px; font-size: 13px; text-transform: uppercase;">Voir</a>
-                            </div>
-                        </div>
+        {# 2. Reste des éléments : la boucle de produits #}
+        {% for product in products %}
+            <div class="product-card" style="text-align: left;">
+                {# Image du sweat-shirt #}
+                <img src="{{ asset('images/' ~ product.image) }}" onerror="this.src='https://placehold.co/400x450?text={{ product.name }}';" alt="{{ product.name }}" style="width: 100%; display: block; margin-bottom: 15px;">
+                
+                {# Zone basse : Informations à gauche, Bouton à droite #}
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; margin-top: auto;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 700; margin: 0; color: #111;">{{ product.name }}</h3>
+                        <p class="price" style="font-size: 16px; font-weight: 600; color: #666; margin: 5px 0 0 0;">{{ product.price|number_format(2, ',', ' ') }} €</p>
                     </div>
-                {% else %}
-                    <p style="text-align: center; color: #777; grid-column: 1 / -1; font-size: 18px; margin-top: 40px;">
-                        Aucun sweat-shirt ne correspond à cette tranche de prix.
-                    </p>
-                {% endfor %}
+                    <div>
+                        <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn" style="padding: 8px 18px; font-size: 13px; text-transform: uppercase;">Voir</a>
+                    </div>
+                </div>
             </div>
-        </div>
+        {% else %}
+            <p style="text-align: center; color: #777; grid-column: 1 / -1; font-size: 18px; margin-top: 40px;">
+                Aucun sweat-shirt ne correspond à cette tranche de prix.
+            </p>
+        {% endfor %}
     </div>
 {% endblock %}
