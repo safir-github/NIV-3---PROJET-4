@@ -37,21 +37,9 @@ class HomeController extends AbstractController
     // "RouteNotFoundException" lorsque le menu de navigation ou le formulaire de connexion y font référence.
     // Elles seront remplacées au fur et à mesure de l'avancement du projet.
 
-    #[Route('/products', name: 'app_products')]
-    public function productsPlaceholder(): Response
-    {
-        return new Response('<html><body>Page Boutique (En cours de développement)</body></html>');
-    }
-
     #[Route('/cart', name: 'app_cart')]
     public function cartPlaceholder(): Response
     {
         return new Response('<html><body>Page Panier (En cours de développement)</body></html>');
-    }
-
-    #[Route('/register', name: 'app_register')]
-    public function registerPlaceholder(): Response
-    {
-        return new Response('<html><body>Page Inscription (En cours de développement)</body></html>');
     }
 }
